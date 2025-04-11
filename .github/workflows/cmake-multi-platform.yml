@@ -12,6 +12,7 @@ jobs:
 
     strategy:
       fail-fast: false
+
       matrix:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
@@ -44,27 +45,21 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
-      run: |
-        if [ "${RUNNER_OS}" == "Windows" ]; then
-          AVX_FLAGS="-mavx2"
-        else
-          AVX_FLAGS=""
-        fi
-    
-        cmake -B ${{ steps.strings.outputs.build-output-dir }} \
-          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-          -DCMAKE_CXX_FLAGS="${AVX_FLAGS}" \
-          -S ${{ github.workspace }}
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
 
     - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} -- -mavx2
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
 
+      
     - name: Run Executable
       shell: bash
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
@@ -75,11 +70,12 @@ jobs:
 
         if [[ "$RUNNER_OS" == "Windows" ]]; then
           executable_name="memory_access_benchmark.exe"
-          executable_path="Release/$executable_name"
+          executable_path="Release/$executable_name"  # Windows binary is in Release/
         else
-          executable_path="./$executable_name"
+          executable_path="./$executable_name"  # Linux/macOS binary
         fi
 
+        # Check if the executable exists before running
         echo "Checking if executable exists: $executable_path"
         if [ -f "$executable_path" ]; then
           echo "Executable found, running it..."
