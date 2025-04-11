@@ -10,8 +10,8 @@
 ### Build Instructions:
 1. **Clone the repository**:
    ```bash
-   git clone <https://github.com/zgrigoryan/memory_access.git>
-   cd <memory_access>
+   git clone https://github.com/zgrigoryan/memory_access.git
+   cd memory_access
    ```
 
 2. **Compile the C++ program**:
