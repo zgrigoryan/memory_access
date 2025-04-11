@@ -36,16 +36,16 @@ void sum_aligned(const T* data, size_t size) {
     result = sum[0] + sum[1] + sum[2] + sum[3];
 
 #elif defined(__aarch64__) || defined(__arm64__)
-    // Neon for ARM (Fix for double-precision)
-    float64x2_t sum_vec = vdupq_n_f64(0.0);  // Initialize Neon vector to zero (double precision)
+    // Neon for ARM 
+    float64x2_t sum_vec = vdupq_n_f64(0.0); 
     size_t i = 0;
     for (i = 0; i < size / 2 * 2; i += 2) {
         float64x2_t data_vec = vld1q_f64(&data[i]);  // Load 2 doubles (aligned or unaligned)
-        sum_vec = vaddq_f64(sum_vec, data_vec);  // Add the two values (double precision)
+        sum_vec = vaddq_f64(sum_vec, data_vec); 
     }
 
     double sum[2];
-    vst1q_f64(sum, sum_vec);  // Store the result from the Neon vector
+    vst1q_f64(sum, sum_vec); 
     result = sum[0] + sum[1];
 #endif
 
@@ -66,7 +66,7 @@ void sum_unaligned(const T* data, size_t size) {
     __m256d sum_vec = _mm256_setzero_pd();
     size_t i = 0;
     for (i = 0; i < size / 4 * 4; i += 4) {
-        __m256d data_vec = _mm256_loadu_pd(&data[i]);  // Unaligned load
+        __m256d data_vec = _mm256_loadu_pd(&data[i]);
         sum_vec = _mm256_add_pd(sum_vec, data_vec);
     }
 
@@ -75,16 +75,16 @@ void sum_unaligned(const T* data, size_t size) {
     result = sum[0] + sum[1] + sum[2] + sum[3];
 
 #elif defined(__aarch64__) || defined(__arm64__)
-    // Neon for ARM (Fix for double-precision)
-    float64x2_t sum_vec = vdupq_n_f64(0.0);  // Initialize Neon vector to zero (double precision)
+    // Neon for ARM 
+    float64x2_t sum_vec = vdupq_n_f64(0.0);  
     size_t i = 0;
     for (i = 0; i < size / 2 * 2; i += 2) {
-        float64x2_t data_vec = vld1q_f64(&data[i]);  // Load 2 doubles (unaligned)
-        sum_vec = vaddq_f64(sum_vec, data_vec);  // Add the two values (double precision)
+        float64x2_t data_vec = vld1q_f64(&data[i]);  
+        sum_vec = vaddq_f64(sum_vec, data_vec);  
     }
 
     double sum[2];
-    vst1q_f64(sum, sum_vec);  // Store the result from the Neon vector
+    vst1q_f64(sum, sum_vec); 
     result = sum[0] + sum[1];
 #endif
 
